@@ -1,50 +1,72 @@
-# TTS Service
+# gRPC TTS Service
 
-Learning project for a small microservice-based text-to-speech backend.
+Учебный проект микросервисного backend-сервиса для синтеза речи.
 
-The current architecture is:
+Проект состоит из двух сервисов:
+
+- `api_service` — HTTP API на FastAPI. Принимает пользовательский запрос, валидирует текст и отправляет его в TTS-сервис по gRPC.
+- `tts-service` — gRPC-сервис на Python. Получает текст, запускает Piper TTS и возвращает WAV-аудио.
+
+Общение между сервисами описано в protobuf-контракте `proto/tts.proto`.
+
+## Архитектура
 
 ```text
 client
-  -> HTTP POST /synthesize
+  -> POST /synthesize
   -> api_service, FastAPI
-  -> gRPC call
-  -> tts-service, Python gRPC server
-  -> Piper TTS model
-  -> WAV bytes back to the client
+  -> gRPC
+  -> tts-service
+  -> Piper model
+  -> WAV response
 ```
 
-## Project Layout
+## Структура
 
 ```text
-api_service/       FastAPI HTTP gateway
-tts-service/       gRPC text-to-speech service
-proto/             protobuf contract
-generated/         generated Python protobuf/gRPC classes
-k8s/               Kubernetes manifests
-models/piper/      local Piper model files, not committed to git
-run_k8s.sh         local helper script for kind
+.
+├── api_service/          # FastAPI gateway
+│   ├── app/
+│   │   ├── main.py       # HTTP endpoints
+│   │   ├── schemas.py    # request schemas
+│   │   ├── validation.py # input validation
+│   │   └── tts_client.py # gRPC client for tts-service
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── tts-service/          # gRPC TTS service
+│   ├── app/
+│   │   ├── server.py      # gRPC server
+│   │   └── synthesizer.py # Piper wrapper
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── proto/
+│   └── tts.proto          # protobuf/gRPC contract
+│
+├── generated/             # generated Python protobuf files
+├── models/piper/          # local Piper model files, ignored by git
+├── k8s/                   # Kubernetes manifests
+└── run_k8s.sh             # helper script for local kind deployment
 ```
 
-## Local Setup
+## Локальный запуск
 
-Create and activate a Python virtual environment:
+Создать и активировать виртуальное окружение:
 
 ```bash
 /opt/homebrew/bin/python3.12 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install dependencies:
+Установить зависимости:
 
 ```bash
 python -m pip install -r api_service/requirements.txt
 python -m pip install -r tts-service/requirements.txt
 ```
 
-## Download Piper Model
-
-Model files are intentionally ignored by git. Download them before running the real TTS service:
+Скачать Piper-модель:
 
 ```bash
 mkdir -p models/piper
@@ -58,17 +80,7 @@ curl -L \
   -o models/piper/en_US-amy-low.onnx.json
 ```
 
-Quick model check:
-
-```bash
-echo "Hello from Piper" | piper \
-  --model models/piper/en_US-amy-low.onnx \
-  --output_file test.wav
-```
-
-## Run Locally
-
-Terminal 1, start the gRPC TTS service:
+Запустить gRPC TTS-сервис:
 
 ```bash
 source .venv/bin/activate
@@ -76,14 +88,20 @@ PIPER_MODEL_PATH=models/piper/en_US-amy-low.onnx \
 python tts-service/app/server.py
 ```
 
-Terminal 2, start the FastAPI gateway:
+В другом терминале запустить FastAPI:
 
 ```bash
 source .venv/bin/activate
 uvicorn api_service.app.main:app --reload
 ```
 
-Terminal 3, send a request:
+Проверить API:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Отправить запрос на синтез:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/synthesize \
@@ -92,9 +110,9 @@ curl -X POST http://127.0.0.1:8000/synthesize \
   --output result.wav
 ```
 
-## Regenerate gRPC Code
+## Генерация protobuf-классов
 
-If `proto/tts.proto` changes, regenerate Python classes:
+Если изменился `proto/tts.proto`, нужно пересгенерировать Python-код:
 
 ```bash
 source .venv/bin/activate
@@ -105,56 +123,60 @@ python -m grpc_tools.protoc \
   proto/tts.proto
 ```
 
-## Run in Kubernetes with kind
+## Kubernetes
 
-Create a local cluster:
+Проект можно запустить локально в `kind`.
+
+Создать кластер:
 
 ```bash
 kind create cluster --name tts-dev --image kindest/node:v1.32.2
 ```
 
-Build and load local images:
+Далее можно либо запустить скрипт
+```bash
+./run_k8s.sh
+```
+
+Либо прописать команды ниже. Собрать Docker-образы:
 
 ```bash
 docker build -t api-service:local -f api_service/Dockerfile .
 docker build -t tts-service:local -f tts-service/Dockerfile .
+```
 
+Загрузить образы в `kind`:
+
+```bash
 kind load docker-image api-service:local --name tts-dev
 kind load docker-image tts-service:local --name tts-dev
 ```
 
-Apply manifests:
+Применить Kubernetes-манифесты:
 
 ```bash
 kubectl apply -f k8s/
+```
+
+Проверить состояние:
+
+```bash
 kubectl get pods
 kubectl get services
 ```
 
-Forward the API service to localhost:
+Пробросить API на локальную машину:
 
 ```bash
 kubectl port-forward service/api-service 8000:8000
 ```
 
-Send a request:
+Отправить запрос:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/synthesize \
   -H "Content-Type: application/json" \
   -d '{"text":"Hello from Kubernetes","voice":"default"}' \
   --output result.wav
-```
-
-## GitHub
-
-Initialize, commit, and push:
-
-```bash
-git add .
-git commit -m "Initial TTS microservices scaffold"
-git branch -M main
-git remote add origin git@github.com:<your-user>/<your-repo>.git
-git push -u origin main
 ```
 
