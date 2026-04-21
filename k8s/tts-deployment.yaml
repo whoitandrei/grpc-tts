@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-service
+  template:
+    metadata:
+      labels:
+        app: tts-service
+    spec:
+      containers:
+        - name: tts-service
+          image: tts-service:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50051
+          env:
+            - name: PIPER_MODEL_PATH
+              value: "/app/models/piper/en_US-amy-low.onnx"
