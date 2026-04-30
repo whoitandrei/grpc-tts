@@ -34,8 +34,8 @@ def test_synthesize_returns_wav_audio(monkeypatch):
 def test_synthesize_uses_request_defaults(monkeypatch):
     captured = {}
 
-    def fake_synthesize(text: str, voice: str, language: str) -> bytes:
-        captured["args"] = (text, voice, language)
+    def fake_synthesize(text: str, voice: str, language: str, environment: str) -> bytes:
+        captured["args"] = (text, voice, language, environment)
         return b"RIFFdefault-audio"
 
     monkeypatch.setattr(main_module, "synthesize_text", fake_synthesize)
