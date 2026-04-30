@@ -46,6 +46,7 @@ client
 │
 ├── generated/             # generated Python protobuf files
 ├── models/piper/          # local Piper model files, ignored by git
+├── qt_client/              # desktop frontend на C++/Qt
 ├── k8s/                   # Kubernetes manifests
 └── run_k8s.sh             # helper script for local kind deployment
 ```
@@ -108,6 +109,52 @@ curl -X POST http://127.0.0.1:8000/synthesize \
   -H "Content-Type: application/json" \
   -d '{"text":"Hello from FastAPI and gRPC","voice":"default"}' \
   --output result.wav
+```
+
+## Desktop frontend на C++/Qt
+
+В проект добавлен минимальный Qt-клиент `qt_client`.
+
+Он умеет:
+
+- вводить текст запроса и voice;
+- отправлять `POST /synthesize` в `api_service`;
+- получать WAV-ответ и прослушивать его через `QMediaPlayer`;
+- сохранять WAV в выбранный файл;
+- автоматически удалять временный WAV, если пользователь его не сохранил.
+
+Требования:
+
+- Qt 6 с модулями `Widgets`, `Network`, `Multimedia`;
+- CMake 3.21+;
+- запущенные `tts-service` и `api_service`.
+
+Сборка:
+
+```bash
+cmake -S qt_client -B qt_client/build
+cmake --build qt_client/build
+```
+
+Если CMake не находит Qt на macOS, установите Qt и передайте путь к нему:
+
+```bash
+brew install qt
+cmake -S qt_client -B qt_client/build \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
+cmake --build qt_client/build
+```
+
+Запуск:
+
+```bash
+./qt_client/build/tts_qt_client
+```
+
+По умолчанию клиент отправляет запросы на:
+
+```text
+http://127.0.0.1:8000/synthesize
 ```
 
 ## Генерация protobuf-классов
@@ -179,4 +226,3 @@ curl -X POST http://127.0.0.1:8000/synthesize \
   -d '{"text":"Hello from Kubernetes","voice":"default"}' \
   --output result.wav
 ```
-

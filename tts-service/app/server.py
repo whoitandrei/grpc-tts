@@ -17,6 +17,7 @@ class TTSService(tts_pb2_grpc.TTSServiceServicer):
     def SynthesizeVoice(self, request, context):
         print(f"text={request.text}")
         print(f"voice={request.voice}")
+        print(f"language={request.language}")
         print(f"request_id={request.request_id}")
 
         MODEL_PATH = os.getenv("PIPER_MODEL_PATH", "models/piper/en_US-amy-low.onnx")
