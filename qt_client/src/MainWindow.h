@@ -55,6 +55,7 @@ private:
     QLabel *statusLabel_ = nullptr;
     QComboBox *voiceCombo_ = nullptr;
     QComboBox *langCombo_ = nullptr;
+    QComboBox *envCombo_ = nullptr;
 
     QScopedPointer<QTemporaryFile> audioFile_;
     bool audioSaved_ = false;

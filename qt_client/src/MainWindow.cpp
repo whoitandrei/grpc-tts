@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QComboBox>
 #include <QSlider>
+#include <QGridLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -60,18 +61,29 @@ void MainWindow::buildUi()
     auto *central = new QWidget(this);
     auto *rootLayout = new QVBoxLayout(central);
 
-    auto *formLayout = new QFormLayout();
+    auto *formLayout = new QGridLayout();
     apiUrlEdit_ = new QLineEdit("http://127.0.0.1:8000/synthesize", central);
     voiceCombo_ = new QComboBox(central);
     voiceCombo_->addItem("default");
+    envCombo_ = new QComboBox(central);
+    envCombo_->addItem("onnxruntime");
+    envCombo_->addItem("cli");
 
     langCombo_ = new QComboBox(central);
     langCombo_->addItem("en");
 
 
-    formLayout->addRow("API URL:", apiUrlEdit_);
-    formLayout->addRow("Голос:", voiceCombo_);
-    formLayout->addRow("Язык:", langCombo_);
+    formLayout->addWidget(new QLabel("API URL:"), 0, 0);
+    formLayout->addWidget(apiUrlEdit_, 0, 1);
+
+    formLayout->addWidget(new QLabel("Голос:"), 1, 0);
+    formLayout->addWidget(voiceCombo_, 1, 1);
+
+    formLayout->addWidget(new QLabel("Язык:"), 1, 2);
+    formLayout->addWidget(langCombo_, 1, 3);
+
+    formLayout->addWidget(new QLabel("Окружение:"), 1, 4);
+    formLayout->addWidget(envCombo_, 1, 5);
 
     textEdit_ = new QTextEdit(central);
     textEdit_->setPlaceholderText("Введите текст, который нужно озвучить...");
@@ -135,6 +147,9 @@ void MainWindow::synthesize()
     payload["language"] = langCombo_->currentText().trimmed().isEmpty() 
         ? QString("en")
         : langCombo_->currentText().trimmed();
+    payload["environment"] = envCombo_->currentText().trimmed().isEmpty()
+        ? QString("onnxruntime")
+        : envCombo_->currentText().trimmed();
 
     QNetworkRequest request(apiUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
