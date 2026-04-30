@@ -14,7 +14,7 @@ def test_grpc_server_returns_audio_response(monkeypatch):
             return b"wave-bytes"
 
     monkeypatch.setenv("PIPER_MODEL_PATH", "models/piper/test-model.onnx")
-    monkeypatch.setattr(server_module, "PiperSynthesizer", FakeSynthesizer)
+    monkeypatch.setattr(server_module, "PiperCliSynthesizer", FakeSynthesizer)
 
     request = tts_pb2.SynthesizeRequest(
         text="Hello from gRPC",

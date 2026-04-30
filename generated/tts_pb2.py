@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ttts.proto\x12\x06tts.v1\"V\n\x11SynthesizeRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05voice\x18\x02 \x01(\t\x12\x12\n\nrequest_id\x18\x03 \x01(\t\x12\x10\n\x08language\x18\x04 \x01(\t\"_\n\x12SynthesizeResponse\x12\r\n\x05\x61udio\x18\x01 \x01(\x0c\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x03 \x01(\t\x12\x12\n\nrequest_id\x18\x05 \x01(\t2V\n\nTTSService\x12H\n\x0fSynthesizeVoice\x12\x19.tts.v1.SynthesizeRequest\x1a\x1a.tts.v1.SynthesizeResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ttts.proto\x12\x06tts.v1\"k\n\x11SynthesizeRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05voice\x18\x02 \x01(\t\x12\x10\n\x08language\x18\x03 \x01(\t\x12\x13\n\x0b\x65nvironment\x18\x04 \x01(\t\x12\x12\n\nrequest_id\x18\x05 \x01(\t\"_\n\x12SynthesizeResponse\x12\r\n\x05\x61udio\x18\x01 \x01(\x0c\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x03 \x01(\t\x12\x12\n\nrequest_id\x18\x05 \x01(\t2V\n\nTTSService\x12H\n\x0fSynthesizeVoice\x12\x19.tts.v1.SynthesizeRequest\x1a\x1a.tts.v1.SynthesizeResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,9 +32,9 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'tts_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_SYNTHESIZEREQUEST']._serialized_start=21
-  _globals['_SYNTHESIZEREQUEST']._serialized_end=107
-  _globals['_SYNTHESIZERESPONSE']._serialized_start=109
-  _globals['_SYNTHESIZERESPONSE']._serialized_end=204
-  _globals['_TTSSERVICE']._serialized_start=206
-  _globals['_TTSSERVICE']._serialized_end=292
+  _globals['_SYNTHESIZEREQUEST']._serialized_end=128
+  _globals['_SYNTHESIZERESPONSE']._serialized_start=130
+  _globals['_SYNTHESIZERESPONSE']._serialized_end=225
+  _globals['_TTSSERVICE']._serialized_start=227
+  _globals['_TTSSERVICE']._serialized_end=313
 # @@protoc_insertion_point(module_scope)

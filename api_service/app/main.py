@@ -16,7 +16,7 @@ def synthesize(request: SynthesizeRequest):
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
     
-    audio_data = synthesize_text(request.text, request.voice, request.language)
+    audio_data = synthesize_text(request.text, request.voice, request.language, request.environment)
 
     return Response(
         content=audio_data,

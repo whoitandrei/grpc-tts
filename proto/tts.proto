@@ -9,8 +9,9 @@ service TTSService {
 message SynthesizeRequest {
   string text = 1;
   string voice = 2;
-  string request_id = 3;
-  string language = 4;
+  string language = 3;
+  string environment = 4;
+  string request_id = 5;
 }
 
 message SynthesizeResponse {

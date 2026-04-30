@@ -22,7 +22,7 @@ def test_tts_client_builds_grpc_request(monkeypatch):
     monkeypatch.setattr(tts_client.grpc, "insecure_channel", fake_channel)
     monkeypatch.setattr(tts_client.tts_pb2_grpc, "TTSServiceStub", FakeStub)
 
-    audio = tts_client.synthesize_text("Hello", "amy", "en")
+    audio = tts_client.synthesize_text("Hello", "amy", "en", "onnxruntime")
 
     assert audio == b"grpc-audio"
     assert captured["address"] == "tts-service:50051"
@@ -30,4 +30,5 @@ def test_tts_client_builds_grpc_request(monkeypatch):
     assert captured["request"].text == "Hello"
     assert captured["request"].voice == "amy"
     assert captured["request"].language == "en"
+    assert captured["request"].environment == "onnxruntime"
     assert captured["request"].request_id

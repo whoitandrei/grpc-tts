@@ -4,3 +4,4 @@ class SynthesizeRequest(BaseModel):
     text: str
     voice: str = "default"
     language: str = "en"
+    environment: str = "onnxruntime"
