@@ -1,0 +1,12 @@
+.git
+.github
+.venv
+.vscode
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+qt_client/build/
+result.wav
+*.pyc
+*.pyo
