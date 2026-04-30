@@ -13,6 +13,7 @@ class QTextEdit;
 class QAudioOutput;
 class QNetworkReply;
 class QComboBox;
+class QSlider;
 
 class MainWindow : public QMainWindow
 {
@@ -27,6 +28,7 @@ private slots:
     void handleSynthesizeFinished(QNetworkReply *reply);
     void playAudio();
     void stopAudio();
+    void pauseAudio();
     void saveAudio();
     void updatePlaybackState(QMediaPlayer::PlaybackState state);
     void showPlaybackError();
@@ -41,12 +43,14 @@ private:
     QNetworkAccessManager network_;
     QMediaPlayer player_;
     QAudioOutput *audioOutput_ = nullptr;
+    QSlider *positionSlider_ = nullptr;
 
     QLineEdit *apiUrlEdit_ = nullptr;
     QTextEdit *textEdit_ = nullptr;
     QPushButton *sendButton_ = nullptr;
     QPushButton *playButton_ = nullptr;
     QPushButton *stopButton_ = nullptr;
+    QPushButton *pauseButton_ = nullptr;
     QPushButton *saveButton_ = nullptr;
     QLabel *statusLabel_ = nullptr;
     QComboBox *voiceCombo_ = nullptr;

@@ -21,10 +21,12 @@
 #include <QUrl>
 #include <QWidget>
 #include <QComboBox>
+#include <QSlider>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      audioOutput_(new QAudioOutput(this))
+      audioOutput_(new QAudioOutput(this)),
+      positionSlider_(new QSlider(Qt::Horizontal, this))
 {
     player_.setAudioOutput(audioOutput_);
 
@@ -37,6 +39,17 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updatePlaybackState);
     connect(&player_, &QMediaPlayer::errorOccurred,
             this, &MainWindow::showPlaybackError);
+    connect(&player_, &QMediaPlayer::durationChanged, this, [=](qint64 duration) {
+        positionSlider_->setRange(0, duration);
+    });
+    connect(&player_, &QMediaPlayer::positionChanged, this, [=](qint64 position) {
+        if (!positionSlider_->isSliderDown())
+            positionSlider_->setValue(position);
+    });
+    connect(positionSlider_, &QSlider::sliderMoved, this, [=](int position) {
+        player_.setPosition(position);
+    });
+
 }
 
 void MainWindow::buildUi()
@@ -65,6 +78,7 @@ void MainWindow::buildUi()
     sendButton_ = new QPushButton("Синтезировать", central);
     playButton_ = new QPushButton("Прослушать", central);
     stopButton_ = new QPushButton("Стоп", central);
+    pauseButton_ = new QPushButton("Пауза", central);
     saveButton_ = new QPushButton("Сохранить WAV", central);
     statusLabel_ = new QLabel("Готово к использованию", central);
     statusLabel_->setWordWrap(true);
@@ -73,12 +87,14 @@ void MainWindow::buildUi()
     buttonLayout->addWidget(sendButton_);
     buttonLayout->addWidget(playButton_);
     buttonLayout->addWidget(stopButton_);
+    buttonLayout->addWidget(pauseButton_);
     buttonLayout->addWidget(saveButton_);
     buttonLayout->addStretch();
 
     rootLayout->addLayout(formLayout);
     rootLayout->addWidget(new QLabel("Запрос:", central));
     rootLayout->addWidget(textEdit_, 1);
+    rootLayout->addWidget(positionSlider_);
     rootLayout->addLayout(buttonLayout);
     rootLayout->addWidget(statusLabel_);
 
@@ -87,6 +103,7 @@ void MainWindow::buildUi()
     connect(sendButton_, &QPushButton::clicked, this, &MainWindow::synthesize);
     connect(playButton_, &QPushButton::clicked, this, &MainWindow::playAudio);
     connect(stopButton_, &QPushButton::clicked, this, &MainWindow::stopAudio);
+    connect(pauseButton_, &QPushButton::clicked, this, &MainWindow::pauseAudio);
     connect(saveButton_, &QPushButton::clicked, this, &MainWindow::saveAudio);
 }
 
@@ -169,8 +186,12 @@ void MainWindow::playAudio()
         return;
     }
 
-    player_.setPosition(0);
     player_.play();
+}
+
+void MainWindow::pauseAudio()
+{
+    player_.pause();
 }
 
 void MainWindow::stopAudio()
@@ -216,7 +237,7 @@ void MainWindow::saveAudio()
 
 void MainWindow::updatePlaybackState(QMediaPlayer::PlaybackState state)
 {
-    stopButton_->setEnabled(state == QMediaPlayer::PlayingState);
+    pauseButton_->setEnabled(state == QMediaPlayer::PlayingState);
 }
 
 void MainWindow::showPlaybackError()
@@ -241,7 +262,8 @@ void MainWindow::setAudioReady(bool ready)
 {
     playButton_->setEnabled(ready);
     saveButton_->setEnabled(ready);
-    stopButton_->setEnabled(false);
+    stopButton_->setEnabled(ready);
+    pauseButton_->setEnabled(false);
 }
 
 void MainWindow::clearUnsavedAudio()
