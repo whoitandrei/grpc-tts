@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
       positionSlider_(new QSlider(Qt::Horizontal, this))
 {
     player_.setAudioOutput(audioOutput_);
+    audioOutput_->setVolume(1.0);
 
     buildUi();
     setAudioReady(false);
