@@ -62,7 +62,7 @@ jobs:
   
   test-api-service:
     name: Test API service
-    depends-on: build-docker
+    needs: build-docker
     runs-on: ubuntu-latest
 
     steps:
