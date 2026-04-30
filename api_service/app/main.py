@@ -12,11 +12,11 @@ def health():
 @app.post("/synthesize")
 def synthesize(request: SynthesizeRequest):
     try:
-        validate_text(request.text)
+        validate_text(request.text, request.language)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
     
-    audio_data = synthesize_text(request.text, request.voice)
+    audio_data = synthesize_text(request.text, request.voice, request.language)
 
     return Response(
         content=audio_data,

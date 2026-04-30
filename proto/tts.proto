@@ -10,11 +10,12 @@ message SynthesizeRequest {
   string text = 1;
   string voice = 2;
   string request_id = 3;
+  string language = 4;
 }
 
 message SynthesizeResponse {
   bytes audio = 1;
   string filename = 2;
   string content_type = 3;
-  string request_id = 4;
+  string request_id = 5;
 }

@@ -51,9 +51,13 @@ void MainWindow::buildUi()
     voiceCombo_ = new QComboBox(central);
     voiceCombo_->addItem("default");
 
+    langCombo_ = new QComboBox(central);
+    langCombo_->addItem("en");
+
 
     formLayout->addRow("API URL:", apiUrlEdit_);
     formLayout->addRow("Голос:", voiceCombo_);
+    formLayout->addRow("Язык:", langCombo_);
 
     textEdit_ = new QTextEdit(central);
     textEdit_->setPlaceholderText("Введите текст, который нужно озвучить...");
@@ -110,6 +114,9 @@ void MainWindow::synthesize()
     payload["voice"] = voiceCombo_->currentText().trimmed().isEmpty()
         ? QString("default")
         : voiceCombo_->currentText().trimmed();
+    payload["language"] = langCombo_->currentText().trimmed().isEmpty() 
+        ? QString("en")
+        : langCombo_->currentText().trimmed();
 
     QNetworkRequest request(apiUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -227,6 +234,7 @@ void MainWindow::setBusy(bool busy)
     apiUrlEdit_->setEnabled(!busy);
     voiceCombo_->setEnabled(!busy);
     textEdit_->setEnabled(!busy);
+    langCombo_->setEnabled(!busy);
 }
 
 void MainWindow::setAudioReady(bool ready)

@@ -50,6 +50,7 @@ private:
     QPushButton *saveButton_ = nullptr;
     QLabel *statusLabel_ = nullptr;
     QComboBox *voiceCombo_ = nullptr;
+    QComboBox *langCombo_ = nullptr;
 
     QScopedPointer<QTemporaryFile> audioFile_;
     bool audioSaved_ = false;
