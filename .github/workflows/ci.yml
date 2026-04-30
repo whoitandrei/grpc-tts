@@ -85,3 +85,29 @@ jobs:
       
       - name: Run API service tests
         run: pytest tests/api_service -q
+
+  tests-tts-service:
+    name: Test TTS service
+    needs: build-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            tts-service/requirements.txt
+            requirements-dev.txt
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r tts-service/requirements.txt -r requirements-dev.txt
+      
+      - name: Run TTS service tests
+        run: pytest tests/tts_service -q
