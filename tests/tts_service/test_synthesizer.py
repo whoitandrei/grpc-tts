@@ -21,7 +21,7 @@ def test_synthesizer_runs_piper_and_reads_wav(monkeypatch):
 
     monkeypatch.setattr(synthesizer_module.subprocess, "run", fake_run)
 
-    synthesizer = synthesizer_module.PiperSynthesizer("models/piper/en_US-amy-low.onnx")
+    synthesizer = synthesizer_module.PiperCliSynthesizer("models/piper/en_US-amy-low.onnx")
     audio = synthesizer.synthesize("Hello from Piper")
 
     assert audio == b"RIFFunit-test-audio"

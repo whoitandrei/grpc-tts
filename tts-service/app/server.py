@@ -2,7 +2,7 @@ from concurrent import futures
 import sys
 from pathlib import Path
 import os
-from synthesizer import PiperSynthesizer
+from synthesizer import PiperCliSynthesizer, PiperORTSynthesizer
 
 import grpc
 
@@ -20,8 +20,12 @@ class TTSService(tts_pb2_grpc.TTSServiceServicer):
         print(f"language={request.language}")
         print(f"request_id={request.request_id}")
 
-        MODEL_PATH = os.getenv("PIPER_MODEL_PATH", "models/piper/en_US-amy-low.onnx")
-        synthesizer = PiperSynthesizer(MODEL_PATH)
+        if (request.environment == "onnxruntime"):
+            MODEL_PATH = os.getenv("PIPER_MODEL_PATH", "models/piper/en_US-amy-low.onnx")
+            synthesizer = PiperORTSynthesizer(MODEL_PATH)
+        else:
+            MODEL_PATH = os.getenv("PIPER_MODEL_PATH", "models/piper/en_US-amy-low.onnx")
+            synthesizer = PiperCliSynthesizer(MODEL_PATH)
 
         audio_data = synthesizer.synthesize(request.text)
 

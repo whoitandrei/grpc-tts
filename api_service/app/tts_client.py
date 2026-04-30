@@ -13,7 +13,7 @@ import tts_pb2
 import tts_pb2_grpc
 
 
-def synthesize_text(text: str, voice: str, language: str) -> bytes:
+def synthesize_text(text: str, voice: str, language: str, environment: str) -> bytes:
     tts_service_addr = os.getenv("TTS_SERVICE_ADDR", "localhost:50051")
     channel = grpc.insecure_channel(tts_service_addr)
 
@@ -23,6 +23,7 @@ def synthesize_text(text: str, voice: str, language: str) -> bytes:
         text=text,
         voice=voice,
         language=language,
+        environment=environment,
         request_id=str(uuid.uuid4()),
     )
 
